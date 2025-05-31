@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react'
+import axios from 'axios';
 
 const Roles = () => {
   const [roles, setRoles] = useState([])
 
   useEffect(() => {
-    // Simulazione dati API
-    const mockRoles = [
-      { id: 1, name: 'ROLE_PATIENT' },
-      { id: 2, name: 'ROLE_DOCTOR' },
-      { id: 3, name: 'ROLE_ADMIN' }
-    ]
-    setRoles(mockRoles)
+    axios.get('/api/roles')
+      .then(res => {
+        setRoles(res.data);
+      })
+      .catch(err => {
+        console.error("Errore durante il fetch dei ruoli", err);
+      })
   }, [])
 
   return (
