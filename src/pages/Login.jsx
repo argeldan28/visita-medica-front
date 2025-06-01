@@ -1,29 +1,39 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import axios from 'axios'
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  })
+  const [formData, setFormData] = useState({ email: '', password: '' })
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Qui dovresti gestire il login
-    console.log('Dati login:', formData)
+    try {
+      const response = await axios.post('http://localhost:8080/api/auth/login', formData)
+      const { token } = response.data
+
+      // Salva il token nel localStorage
+      localStorage.setItem('token', token)
+
+      // Vai alla home o pagina protetta
+      navigate('/visits')
+
+    } catch (err) {
+      setError('Email o password non corretti')
+      console.error(err)
+    }
   }
 
   return (
     <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow">
       <h1 className="text-2xl font-bold mb-6 text-center">Accedi</h1>
+      {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
