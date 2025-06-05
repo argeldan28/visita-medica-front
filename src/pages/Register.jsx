@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +10,9 @@ const Register = () => {
     password: '',
     role: 'patient'
   })
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -17,15 +22,59 @@ const Register = () => {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Qui dovresti gestire la registrazione
-    console.log('Dati registrazione:', formData)
+    try {
+      // Sostituisci con il tuo endpoint API reale
+      const response = await axios.post('http://localhost:8080/api/auth/register', formData)
+      
+      // Mostra il banner di successo
+      setSuccess(true)
+      setError('')
+      
+      // Reindirizza al login dopo 3 secondi
+      setTimeout(() => {
+        navigate('/login')
+      }, 3000)
+      
+    } catch (err) {
+      setError(err.response?.data?.message || 'Errore durante la registrazione')
+      console.error(err)
+    }
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow">
+    <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow relative">
+      <AnimatePresence>
+        {success && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="absolute -top-16 left-0 right-0 bg-green-500 text-white p-4 rounded-lg shadow-lg"
+          >
+            <div className="flex justify-between items-center">
+              <span>Account creato con successo! Reindirizzamento al login...</span>
+              <button 
+                onClick={() => setSuccess(false)}
+                className="text-white hover:text-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <h1 className="text-2xl font-bold mb-6 text-center">Registrazione</h1>
+      
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+          {error}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="username" className="block text-gray-700 mb-2">Username</label>
@@ -80,8 +129,9 @@ const Register = () => {
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+          disabled={success}
         >
-          Registrati
+          {success ? 'Registrazione completata!' : 'Registrati'}
         </button>
       </form>
       <p className="mt-4 text-center text-gray-600">

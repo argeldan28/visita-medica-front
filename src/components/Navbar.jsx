@@ -1,20 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaSignOutAlt, FaUserCircle } from 'react-icons/fa'
+import axios from 'axios'
 
 const Navbar = () => {
   const location = useLocation()
+  
 
-  // 🔐 Simula lo stato login (sostituisci con uno stato reale o context)
-  const isLoggedIn = false; // Cambia a false per testare l'altra vista
-
-  localStorage.setItem('token', response.data.token);
-
-  axios.get('/api/users', {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem('token')}`
-  }
-});
+  const isLoggedIn = !!localStorage.getItem('token')
 
   const links = [
     { path: '/visits', name: 'Visite' },
@@ -22,9 +15,21 @@ const Navbar = () => {
     { path: '/roles', name: 'Ruoli' }
   ]
 
-  const handleLogout = () => {
-    // qui puoi inserire il logout reale
-    console.log("Logout effettuato")
+  const handleLogout = async () => {
+    try {
+      
+      await axios.post('http://localhost:8080/api/auth/logout', null, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      
+      localStorage.removeItem('token')
+     
+      window.location.reload()
+    } catch (err) {
+      console.error('Errore durante il logout:', err)
+    }
   }
 
   return (
@@ -66,14 +71,22 @@ const Navbar = () => {
                 ))}
 
                 {/* Logout Icon */}
-                <button onClick={handleLogout} className="text-red-600 hover:text-red-800 transition-colors">
-                  <FaSignOutAlt size={20} title="Logout" />
+                <button 
+                  onClick={handleLogout} 
+                  className="text-red-600 hover:text-red-800 transition-colors"
+                  aria-label="Logout"
+                >
+                  <FaSignOutAlt size={20} />
                 </button>
               </>
             ) : (
               // Icona utente se NON loggato
-              <Link to="/login" className="text-gray-600 hover:text-blue-600 transition-colors">
-                <FaUserCircle size={24} title="Login" />
+              <Link 
+                to="/login" 
+                className="text-gray-600 hover:text-blue-600 transition-colors"
+                aria-label="Login"
+              >
+                <FaUserCircle size={24} />
               </Link>
             )}
           </div>
