@@ -1,32 +1,18 @@
 import { useState, useEffect } from 'react'
+import axios from 'axios'
 import UserCard from '../components/UserCard'
 
 const Users = () => {
   const [users, setUsers] = useState([])
 
   useEffect(() => {
-    // Simulazione dati API
-    const mockUsers = [
-      {
-        id: 1,
-        username: 'mario_rossi',
-        email: 'mario.rossi@example.com',
-        role: 'Paziente'
-      },
-      {
-        id: 2,
-        username: 'dr_bianchi',
-        email: 'l.bianchi@example.com',
-        role: 'Dottore'
-      },
-      {
-        id: 3,
-        username: 'admin',
-        email: 'admin@clinica.com',
-        role: 'Amministratore'
-      }
-    ]
-    setUsers(mockUsers)
+    axios.get('http://localhost:8080/api/users')
+      .then(response => {
+        setUsers(response.data)
+      })
+      .catch(error => {
+        console.error('Errore durante il fetch degli utenti:', error)
+      })
   }, [])
 
   return (

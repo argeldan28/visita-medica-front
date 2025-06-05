@@ -6,7 +6,10 @@ const UserCard = ({ user }) => {
         <span className="font-medium">Email:</span> {user.email}
       </p>
       <p className="text-gray-600">
-        <span className="font-medium">Ruolo:</span> {user.role || 'N/D'}
+        <span className="font-medium">Ruolo:</span>{' '}
+        {user.roles && user.roles.length > 0
+          ? user.roles.map(role => role.replace('ROLE_', '')).join(', ')
+          : 'N/D'}
       </p>
       <div className="mt-4 flex justify-end space-x-2">
         <button className="px-3 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200">
