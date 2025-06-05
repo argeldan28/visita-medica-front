@@ -5,14 +5,14 @@ const Roles = () => {
   const [roles, setRoles] = useState([])
 
   useEffect(() => {
-    axios.get('/api/roles')
+    axios.get('http://localhost:8080/api/roles')
       .then(res => {
         setRoles(res.data);
       })
       .catch(err => {
         console.error("Errore durante il fetch dei ruoli", err);
-      })
-  }, [])
+      });
+  }, []);
 
   return (
     <div>
